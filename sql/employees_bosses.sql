@@ -1,3 +1,5 @@
+-- MYSQL
+
 CREATE TABLE Employees
     (`employeeID` int, `name` varchar(32), `bossID` int, `salary` int, `departmentID` int)
 ;

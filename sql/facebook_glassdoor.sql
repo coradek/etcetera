@@ -1,3 +1,4 @@
+-- MYSQL
 CREATE TABLE DailyCount
 (`userID` integer, `songID` integer)
 ;
