@@ -1,6 +1,27 @@
--- MYSQL
+-- MYSQL / PSQL
+
+
+/*
+QUESTION:
+You have a table with (date - ignored for now) user_id,
+song_id and count.
+
+It shows at the end of each day how many times in her history a user
+has listened to a given song. So count is cumulative sum.
+
+You have to update this on a daily basis based on a second table that
+records in real time when a user listens to a given song.
+Basically, at the end of each day, you go to this second table
+and pull a count of each user/song combination and then add this count
+to the first table that has the lifetime count. If it is the first
+time a user has listened to a given song, you won't have this pair in
+the lifetime table, so you have to create the pair there and then add
+the count of the last day
+*/
+
+
 CREATE TABLE DailyCount
-(`userID` integer, `songID` integer)
+(user_id integer, song_id integer)
 ;
 
 INSERT INTO DailyCount values
@@ -15,7 +36,7 @@ INSERT INTO DailyCount values
 ;
 
 CREATE TABLE LifeCount
- (`userID` int, `songID` int, `num` int)
+ (user_id int, song_id int, num int)
 ;
 
 INSERT INTO LifeCount VALUES
@@ -24,50 +45,74 @@ INSERT INTO LifeCount VALUES
 ;
 
 -- This bit is very important! (See note below)
-CREATE UNIQUE INDEX ind on LifeCount(userID, songID)
+CREATE UNIQUE INDEX ind on LifeCount(user_id, song_id)
 ;
 
--- FINAL LIFE TABLE should be:
-  -- (1,1,5)
-  -- (1,2,6)
-  -- (1,3,7)
-  -- (2,1,8)
-  -- (2,2,9)
-  -- (2,4,10)
-  -- (3,5,11)
-  -- (4,1,12)
+/*
+ANSWER:
+Final LifeCount Table -
 
--- QUESTION:
--- You have a table with (date - ignored for now) user_id,
--- song_id and count.
+SELECT * FROM lifecount
+ORDER BY num ASC;
 
--- It shows at the end of each day how many times in her history a user
--- has listened to a given song. So count is cumulative sum.
+ user_id | song_id | num
+---------+---------+-----
+       1 |       1 |   5
+       1 |       2 |   6
+       1 |       3 |   7
+       2 |       1 |   8
+       2 |       2 |   9
+       2 |       4 |  10
+       3 |       5 |  11
+       4 |       1 |  12
+*/
 
--- You have to update this on a daily basis based on a second table that
--- records in real time when a user listens to a given song.
--- Basically, at the end of each day, you go to this second table
--- and pull a count of each user/song combination and then add this count
--- to the first table that has the lifetime count. If it is the first
--- time a user has listened to a given song, you won't have this pair in
--- the lifetime table, so you have to create the pair there and then add
--- the count of the last day
+
 
 
 -- SOLUTION (without the date bit)
-INSERT OR REPLACE INTO LifeCount
-    SELECT D.userID, D.songID
+-- MYSQL
+REPLACE INTO LifeCount
+    SELECT D.user_id, D.song_id
            , IFNULL(L.num,0) +  IFNULL(D.c,0) as num
 	FROM
 	(
-	SELECT userID, songID, COUNT(songID) as c
+	SELECT user_id, song_id, COUNT(song_id) as c
 	FROM DailyCount
-	GROUP BY userID, songID
+	GROUP BY user_id, song_id
 	) as D
 	LEFT JOIN -- left join ensures all user/song pairs from D
             -- pairs not yet in L will have null 'num' value
 	LifeCount as L
-	ON D.userID = L.userID AND D.songID = L.songID
+	ON D.user_id = L.user_id AND D.song_id = L.song_id
+;
+
+
+-- PSQL
+WITH T AS (
+  SELECT D.user_id, D.song_id
+       , COALESCE(L.num,0) +  COALESCE(D.c,0) as num
+  FROM
+  (
+  SELECT user_id, song_id, COUNT(song_id) as c
+  FROM DailyCount
+  GROUP BY user_id, song_id
+  ) as D
+  LEFT JOIN -- left join ensures all user/song pairs from D
+            -- pairs not yet in L will have null 'num' value
+  LifeCount as L
+  ON D.user_id = L.user_id AND D.song_id = L.song_id
+)
+
+INSERT INTO LifeCount
+  (SELECT * FROM T)
+ON CONFLICT(user_id, song_id)
+DO UPDATE SET
+  num = EXCLUDED.num
+;
+
+
+
 
 ----------------------------------------------------
 ----------------------------------------------------
@@ -76,37 +121,40 @@ INSERT OR REPLACE INTO LifeCount
 
 
 -- Run this query for a better view of values being added
-SELECT D.userID, D.songID, L.num, D.c
-       , IFNULL(L.num,0) +  IFNULL(D.c,0) as tot
+SELECT D.user_id, D.song_id, L.num, D.c
+       , COALESCE(L.num,0) +  COALESCE(D.c,0) as tot
 FROM
 (
-SELECT userID, songID, COUNT(songID) as c
+SELECT user_id, song_id, COUNT(song_id) as c
 FROM DailyCount
-GROUP BY userID, songID
+GROUP BY user_id, song_id
 ) as D
 LEFT JOIN -- left join ensures all user/song pairs from D
           -- pairs not yet in L will have null num value
 LifeCount as L
-ON D.userID = L.userID AND D.songID = L.songID
+ON D.user_id = L.user_id AND D.song_id = L.song_id
 ;
 
 
 -- SEE RESULTS (GROUP BY VERSION)
-SELECT userID, songID, sum(num) as new_total
+SELECT user_id, song_id, sum(num) as new_total
 FROM
 (
-   SELECT userID, songID, num
+   SELECT user_id, song_id, num
    FROM
        LifeCount
    UNION ALL
-       SELECT userID, songID, COUNT(songID) as num
+       SELECT user_id, song_id, COUNT(song_id) as num
        FROM DailyCount
-       GROUP BY userID, songID
+       GROUP BY user_id, song_id
 )
-GROUP BY userID, songID
+GROUP BY user_id, song_id
 ;
 
 
 -- NOTE:
 -- without the unique index, the insert or replace command would
 -- create new rows with user/song pairs already in the LifeCount table
+
+-- QUESTION: Is the unique index needed for PSQL?
+-- since the conflict is specified in the 'ON CONFLICT()' clause
