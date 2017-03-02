@@ -6,7 +6,7 @@ from datetime  import datetime
 Create Practice Tables for dinosaurs.sql question
 '''
 
-# TODO: could make this write the file automattically
+# TODO: could make this write the .sql file automattically
 
 def make_dinobone_table():
     species = ['Tyrannosaurus rex', 'Triceratops', 'Pteranodon', 'Velociraptor']

@@ -40,6 +40,7 @@ Ellisdale          |   4       # on how duplicates are handled
 QUESTION 2: (advanced: requires window functions)
 Find names of the top 3 sites each year for Velociraptor Bones
 
+ANSWER:
        site        | year | find_rank | find_count
 --------------------+------+-----------+------------
 Hilda mega-bonebed | 2014 |         1 |          6

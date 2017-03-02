@@ -40,7 +40,21 @@ Ellisdale          |   4       # on how duplicates are handled
 QUESTION 2: (advanced: requires window functions)
 Find names of the top 3 sites each year for Velociraptor Bones
 
-
+ANSWER:
+       site        | year | find_rank | find_count
+--------------------+------+-----------+------------
+Hilda mega-bonebed | 2014 |         1 |          6
+Como Bluff         | 2014 |         2 |          5
+Seymour Island     | 2014 |         3 |          4
+Ellisdale          | 2014 |         3 |          4
+Orapa              | 2014 |         3 |          4
+Orapa              | 2015 |         1 |          6
+Seymour Island     | 2015 |         1 |          6
+Cantwell Formation | 2015 |         3 |          4
+Cantwell Formation | 2016 |         1 |          7
+Hilda mega-bonebed | 2016 |         2 |          6
+Orapa              | 2016 |         3 |          4
+Cerro del Pueblo   | 2016 |         3 |          4
 _________________________________
 
 Velociraptor find counts by year:
