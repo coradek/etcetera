@@ -1,5 +1,9 @@
 import numpy as np
 
+'''
+Given Matrix M of random numers, find the maximum possible sum attainable by walking M adding the values of each location visited. A walk starts at any point in the left most column and moves only right, up, or down never visiting any location more than once. It ends as soon as it enters the right-most column.
+'''
+
 def maxwalk(arr):
     arr = np.array(arr)
     rows = arr.shape[0]
@@ -11,27 +15,28 @@ def maxwalk(arr):
         col = arr[:,j]
         # print "column: ", col
         for k in xrange(rows):
-            #
+            # old_max[i] : max path to point of entry, col[i]
+            # sum(col[min(i,k):max(i,k)+1]) : total accumulated in col
+            #                     entering at col[i] leaving at col[k]
+            # max( . . .) : best path that leaves at col[k]
             new_max[k] = max(sum(col[min(i,k):max(i,k)+1])+old_max[i] for i in xrange(rows))
         # print "new max: ", new_max
         old_max = new_max[:]
 
-    # add final path value to corresponding ele in last col --> return max
+    # add final col value to max path entering at that value --> return max
     return max([new_max[i]+arr[:,-1][i] for i in xrange(rows)])
 
 
+# WARNING: the code below is not pep-8 compliant!!!
+# (to annoy matt [who provided this problem],
+# I am curious to see how gross of a list comprehension I can make)
 def so_so_gross(arr):
-    # WARNING: not pep-8 compliant!!!
-    # to annoy matt, I am curious how gross of a list comprehension I can make
     arr = np.array(arr)
     old_max = [0]*arr.shape[0]
     new_max = [None]*arr.shape[0]
-
     for j in xrange(arr.shape[1]-1):
-        col = arr[:,j]
-        new_max = [max(sum(col[min(i,k):max(i,k)+1])+old_max[i] for i in xrange(arr.shape[0])) for k in xrange(arr.shape[0])]
+        new_max = [max(sum(arr[:,j][min(i,k):max(i,k)+1])+old_max[i] for i in xrange(arr.shape[0])) for k in xrange(arr.shape[0])]
         old_max = new_max[:]
-
     return max([new_max[i]+arr[:,-1][i] for i in xrange(arr.shape[0])])
 
 
@@ -64,8 +69,8 @@ if __name__ == '__main__':
          [47, 70, 70, 61, 58, -11, 7, -88, -71, -80],
          [4, -81, 6, -1, 73, -71, 54, 3, -13, -14]]
 
-    # print maxwalk(A), ' (527)'
-    # print maxwalk(B), ' (527)'
-    # print maxwalk(C), ' (1848)'
+    print maxwalk(A), ' (527)'
+    print maxwalk(B), ' (527)'
+    print maxwalk(C), ' (1848)'
 
-    print so_so_gross(A)
+    # print so_so_gross(A)

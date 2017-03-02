@@ -73,7 +73,7 @@ ORDER BY num ASC;
 -- SOLUTION (without the date bit)
 -- MYSQL
 REPLACE INTO LifeCount
-    SELECT D.user_id, D.song_id
+  SELECT D.user_id, D.song_id
            , IFNULL(L.num,0) +  IFNULL(D.c,0) as num
 	FROM
 	(
