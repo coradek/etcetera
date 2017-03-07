@@ -75,7 +75,7 @@ LIMIT 5
 -- QUESTION 2:
 -- Version 2: neater/more readable, but could it be more concise?
 WITH RECURSIVE
-  T1 AS (
+  T1 AS ( -- get count of vr bones for each site/year pair
     SELECT S.name as site
          , date_part('year', F.date_found) as year
          , COUNT(D.name) as find_count
@@ -88,7 +88,7 @@ WITH RECURSIVE
     GROUP BY year, S.name, D.name
     ORDER BY year, find_count DESC
     )
-, T2 AS (
+, T2 AS ( -- rank the counts
     SELECT site
          , year
          , rank() OVER(PARTITION BY year ORDER BY find_count DESC)
@@ -104,8 +104,7 @@ WHERE find_rank < 4
 
 -- QUESTION 2:
 -- Version 3: more concise . . . less readbale?
--- WITH RECURSIVE
---   T AS (
+-- WITH T AS (
 --     SELECT S.name as site
 --          , date_part('year', F.date_found) as year
 --          , rank() OVER(PARTITION BY date_part('year', F.date_found)

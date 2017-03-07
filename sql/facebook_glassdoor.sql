@@ -17,6 +17,23 @@ time a user has listened to a given song, you won't have this pair in
 the lifetime table, so you have to create the pair there and then add
 the count of the last day
 
+DailyCount:
+user_id | song_id
+---------+---------
+      1 |       1
+      1 |       2
+      1 |       3
+      1 |       3
+      2 |       2
+
+LifeCount:
+user_id | song_id | num
+---------+---------+-----
+      2 |       1 |   8
+      3 |       5 |  11
+      4 |       1 |  12
+      1 |       3 |   7
+      2 |       2 |   9
 
 ANSWER:
 Final LifeCount Table -
