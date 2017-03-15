@@ -1,6 +1,7 @@
 from __future__ import division
 from random import randint
 from fractions import gcd
+import numpy as np
 
 '''
 Pi can be approximated by finding the
@@ -44,9 +45,26 @@ def approx_pi_unreadable(pairs=10000, ceiling=10000):
 # TODO: build numpy version and test for speed with large pairs/ceiling
 # http://stackoverflow.com/questions/15569429/numpy-gcd-function
 
+def np_gcd(a, b):
+    a, b = np.broadcast_arrays(a, b)
+    a = a.copy()
+    b = b.copy()
+    pos = np.nonzero(b)[0]
+    while len(pos) > 0:
+        b2 = b[pos]
+        a[pos], b[pos] = b2, a[pos] % b2
+        pos = pos[b[pos]!=0]
+    return a
+
+
+def approx_pi_np(pairs=10000, ceiling=10000):
+    a = np.random.randint(1, ceiling, pairs)
+    b = np.random.randint(1, ceiling, pairs)
+    g = np_gcd(a,b)
+    pass
 
 
 if __name__ == '__main__':
-    n = 1000000
+    n = 100000
     for x in xrange(5):
         print approx_pi(n,n)
