@@ -22,7 +22,7 @@ pi ~= SQRT(6/x^2)
 
 '''
 
-def approx_pi(pairs, ceiling=1000):
+def approx_pi(pairs=100000, ceiling=100000):
     coprime = 0
 
     for x in xrange(pairs):
@@ -33,6 +33,20 @@ def approx_pi(pairs, ceiling=1000):
     return (6/(coprime/pairs))**(0.5)
 
 
+def approx_pi_unreadable(pairs=10000, ceiling=10000):
+    # Continuing my tradition of breaking pep-8 in order to terrify Matt . . .
+    def r():
+        return randint(1,ceiling)
+    L = [gcd(r(), r()) == 1 for x in xrange(pairs)]
+    return (6/(sum(L)/len(L)))**0.5
+
+
+# TODO: build numpy version and test for speed with large pairs/ceiling
+# http://stackoverflow.com/questions/15569429/numpy-gcd-function
+
+
+
 if __name__ == '__main__':
+    n = 1000000
     for x in xrange(5):
-        print approx_pi(1000)
+        print approx_pi(n,n)
