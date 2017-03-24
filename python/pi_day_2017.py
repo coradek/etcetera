@@ -42,7 +42,7 @@ def approx_pi_unreadable(pairs=10000, ceiling=10000):
     return (6/(sum(L)/len(L)))**0.5
 
 
-# TODO: build numpy version and test for speed with large pairs/ceiling
+# TODO: build numpy version and test for speed with large #pairs/ceiling
 # http://stackoverflow.com/questions/15569429/numpy-gcd-function
 
 def np_gcd(a, b):
